@@ -35,6 +35,7 @@ client = DirectoryClient(
 	port=5200,
 )
 
+client.make_online()
 print(client.get_stations())
 ```
 
