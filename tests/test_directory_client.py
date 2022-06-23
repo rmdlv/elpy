@@ -14,4 +14,4 @@ def test_requests():
     assert directory_client.make_busy() == "OK2.5"
     assert directory_client.make_offline() == "OK2.5"
 
-    assert directory_client.get_calls().startswith("@@@\n")
+    assert directory_client.get_stations().startswith("@@@\n")

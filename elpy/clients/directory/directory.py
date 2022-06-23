@@ -1,7 +1,7 @@
 import socket
 from datetime import datetime
 
-from .packet_patterns import MAKE_ONLINE, MAKE_OFFLINE, MAKE_BUSY, GET_CALLS
+from .packet_patterns import MAKE_ONLINE, MAKE_OFFLINE, MAKE_BUSY, GET_STATIONS
 
 from .exceptions import InvalidResponse
 
@@ -25,7 +25,7 @@ class DirectoryClient:
         self.host = host
         self.port = port
 
-    def _send_packet(self, packet: str) -> str:
+    def _send_packet(self, packet: str, validate: bool = False) -> str:
         tcp_client = socket.socket()
         tcp_client.connect((self.host, self.port))
         tcp_client.send(packet.encode(self.PACKET_ENCODING))
@@ -39,7 +39,11 @@ class DirectoryClient:
             else:
                 tcp_client.close()
 
-                return response.decode(self.PACKET_ENCODING)
+                response = response.decode(self.PACKET_ENCODING)
+                if validate and not self._validate_response(response):
+                    raise InvalidResponse(response)
+
+                return response
 
     def _get_time_string(self) -> str:
         now = datetime.now()
@@ -57,10 +61,9 @@ class DirectoryClient:
                 password=self.password,
                 time_string=self._get_time_string(),
                 description=self.description,
-            )
+            ),
+            True,
         )
-        if not self._validate_response(response):
-            raise InvalidResponse(response)
         return response
 
     def make_offline(self):
@@ -69,10 +72,9 @@ class DirectoryClient:
                 callsign=self.callsign,
                 password=self.password,
                 description=self.description,
-            )
+            ),
+            True,
         )
-        if not self._validate_response(response):
-            raise InvalidResponse(response)
         return response
 
     def make_busy(self):
@@ -82,13 +84,12 @@ class DirectoryClient:
                 password=self.password,
                 time_string=self._get_time_string(),
                 description=self.description,
-            )
+            ),
+            True,
         )
-        if not self._validate_response(response):
-            raise InvalidResponse(response)
         return response
 
-    def get_calls(self):
-        response = self._send_packet(GET_CALLS)
+    def get_stations(self):
+        response = self._send_packet(GET_STATIONS)
         # TODO: Add station list parsing
         return response
