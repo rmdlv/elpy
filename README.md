@@ -27,7 +27,7 @@ pip install -U https://github.com/rmdlv/elpy/archive/refs/heads/main.zip
 ```python
 from elpy import DirectoryClient
 
-client  =  DirectoryClient(
+client = DirectoryClient(
 	callsign="RA0SMS",
 	password="SamplePass123",
 	description="elpy client for Python",
