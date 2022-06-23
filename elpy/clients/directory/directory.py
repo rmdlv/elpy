@@ -3,7 +3,7 @@ from datetime import datetime
 
 from .packet_patterns import MAKE_ONLINE, MAKE_OFFLINE, MAKE_BUSY, GET_STATIONS
 
-from .exceptions import InvalidResponse
+from .exceptions import InvalidResponse, LoginRequired
 
 
 class DirectoryClient:
@@ -24,6 +24,8 @@ class DirectoryClient:
 
         self.host = host
         self.port = port
+
+        self._logged = False
 
     def _send_packet(self, packet: str, validate: bool = False) -> str:
         tcp_client = socket.socket()
@@ -64,6 +66,7 @@ class DirectoryClient:
             ),
             True,
         )
+        self._logged = True
         return response
 
     def make_offline(self):
@@ -75,6 +78,7 @@ class DirectoryClient:
             ),
             True,
         )
+        self._logged = True
         return response
 
     def make_busy(self):
@@ -87,9 +91,12 @@ class DirectoryClient:
             ),
             True,
         )
+        self._logged = True
         return response
 
     def get_stations(self):
+        if not self._logged:
+            raise LoginRequired
         response = self._send_packet(GET_STATIONS)
         # TODO: Add station list parsing
         return response

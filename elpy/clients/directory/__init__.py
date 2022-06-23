@@ -1,3 +1,5 @@
 from .directory import DirectoryClient
 
-__all__ = ("DirectoryClient",)
+from .exceptions import InvalidResponse, LoginRequired
+
+__all__ = ("DirectoryClient", "InvalidResponse", "LoginRequired")
